@@ -15,6 +15,10 @@ class CreateCategoriesTable extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            //by default strings have 255 characters, we will increase the characters for this field
+            $table->string('description', 1000);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

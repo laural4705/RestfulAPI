@@ -52,6 +52,12 @@ return [
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
+            //The characters take 4x's the space more than utf8. Laravel want to support emoticons inside the
+            //database and that is only possible using utf8mb4. By default laravel uses 255 characters as the
+            //length for the strings, but by default MySql only supports 767 characters for the strings that will
+            //be used as indexes. So 255 X 4 = 1020 characters - so 767/4 = 191.75 - so our default string length
+            //must be 191 instead of 255.  So we can go to App/Providers/AppServiceProvider and set a default
+            //string length in the boot method to avoid problems in our migrations
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
