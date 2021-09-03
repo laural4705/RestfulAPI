@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Transformers\ProductTransformer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,6 +29,8 @@ class Product extends Model
     protected $hidden = [
         'pivot'
     ];
+
+    public $transformer = ProductTransformer::class;
 
     //This method will check to see if 'status' is equal to 'available', if yes, then true, else false.
     public function isAvailable() {
