@@ -4,6 +4,7 @@
     use Illuminate\Pagination\LengthAwarePaginator;
     use Illuminate\Support\Collection;
     use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Support\Facades\Cache;
 
     trait ApiResponser {
         private function successResponse($data, $code) {
@@ -30,6 +31,9 @@
             $collection = $this->paginate($collection);
             //And Transform
             $collection = $this->transformData($collection, $transformer);
+            //Cache Response
+            $collection = $this->cacheResponse($collection, $transformer);
+
             return $this->successResponse($collection, $code);
         }
         protected function showOne(Model $instance, $code = 200) {
@@ -83,5 +87,18 @@
         protected function transformData($data, $transformer) {
             $transformation = fractal($data, new $transformer);
             return $transformation->toArray();
+        }
+
+        //30 seconds - Using cache like this will ruin the search results, pagination or sort because the
+        //cached response will override all of our url parameters
+        protected function cacheResponse($data) {
+            $url = request()->url();
+            $queryParams = request()->query();
+            ksort($queryParams);
+            $queryString = http_build_query($queryParams);
+            $fullUrl = "{$url}?{$queryString}";
+            return Cache::remember($fullUrl, 30, function() use($data) {
+                return $data;
+            });
         }
     }
